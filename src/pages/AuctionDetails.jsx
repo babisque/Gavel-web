@@ -25,9 +25,15 @@ export default function AuctionDetails() {
     fetchAuction();
   }, [id]);
 
-  useAuctionHub(id, (bid) => {
-    setAuction((prevAuction) => ({ ...prevAuction, currentPrice: bid.amount }));
-  });
+  useAuctionHub(id, 
+    (bid) => {
+      setAuction((prev) => ({ ...prev, currentPrice: bid.amount }));
+    },
+    () => {
+      setAuction((prev) => ({ ...prev, status: 2 }));
+    }
+  );
+    
 
   if (loading) {
     return (
@@ -83,10 +89,14 @@ export default function AuctionDetails() {
         </div>
 
         <div className="bg-gray-750 p-8 flex flex-col justify-center items-center border-l border-gray-700">
-          <BidForm 
-            auctionId={id} 
-            currentPrice={auction.currentPrice} 
-          />
+          {auction.status !== 2 ? (
+            <BidForm 
+              auctionId={id} 
+              currentPrice={auction.currentPrice} 
+            />
+          ) : (
+            <div className="text-center text-red-500 font-semibold">This auction has ended.</div>
+          )}
         </div>
       </div>
     </div>

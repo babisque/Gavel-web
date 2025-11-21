@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 
-export function useAuctionHub(auctionId, onBidReceived) {
+export function useAuctionHub(auctionId, onBidReceived, onAuctionClosed) {
   useEffect(() => {
     const connection = new HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_SIGNALR_URL}`)
@@ -17,6 +17,10 @@ export function useAuctionHub(auctionId, onBidReceived) {
         connection.on("NewBidPlaced", (bid) => {
           onBidReceived(bid);
         });
+
+        connection.on("AuctionClosed", () => {
+          if (onAuctionClosed) onAuctionClosed();
+        });
       } catch (err) {
         console.error("SignalR Error:", err);
       }
@@ -27,5 +31,5 @@ export function useAuctionHub(auctionId, onBidReceived) {
     return () => {
       connection.stop();
     };
-  }, [auctionId, onBidReceived]);
+  }, [auctionId, onBidReceived, onAuctionClosed]);
 }
