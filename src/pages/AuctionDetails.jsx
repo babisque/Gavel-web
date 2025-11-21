@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import api from "../services/api";
 import BidForm from "../components/BidForm";
+import { formatCurrency } from "../utils/format";
+import { useAuctionHub } from "../hooks/useAuctionHub";
+import Skeleton from "../components/Skeleton";
 
 export default function AuctionDetails() {
   const { id } = useParams();
   const [auction, setAuction] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [setConnection] = useState(null);
 
   useEffect(() => {
     async function fetchAuction() {
@@ -24,46 +25,40 @@ export default function AuctionDetails() {
     fetchAuction();
   }, [id]);
 
-  useEffect(() => {
-    const newConnection = new HubConnectionBuilder()
-      .withUrl(import.meta.env.VITE_SIGNALR_URL)
-      .withAutomaticReconnect()
-      .configureLogging(LogLevel.Information)
-      .build();
+  useAuctionHub(id, (bid) => {
+    setAuction((prevAuction) => ({ ...prevAuction, currentPrice: bid.amount }));
+  });
 
-      async function startConnection() {
-        try {
-          await newConnection.start();
-          console.log("SignalR Connected.");
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 text-white p-8 flex justify-center">
+        <div className="max-w-5xl w-full bg-gray-800 rounded-lg shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
+          <div className="p-8">
+            <Skeleton className="h-10 w-3/4 mb-6" />
+          
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-4 w-2/3 mb-8" />
 
-          await newConnection.invoke("JoinAuctionRoom", id);
+            <div className="mb-6 p-4 bg-gray-900 rounded-lg border border-gray-700">
+               <Skeleton className="h-4 w-1/4 mb-2" />
+               <Skeleton className="h-12 w-1/2" />
+            </div>
+          </div>
 
-          newConnection.on("NewBidPlaced", (bid) => {
-            console.log("New bid received:", bid);
-            setAuction((prevAuction) => ({
-              ...prevAuction,
-              currentPrice: bid.amount,
-            }));
-          });
-
-          setConnection(newConnection);
-        } catch (error) {
-          console.error("Connection failed: ", error);
-        }
-      }
-      
-      startConnection();
-
-      return () => {
-        if (newConnection) {
-          newConnection.stop();
-        }
-      };
-  }, [id]);
-
-  if (loading) return <div className="text-white text-center mt-10">Loading...</div>;
+          <div className="bg-gray-750 p-8 flex flex-col justify-center items-center border-l border-gray-700">
+             <div className="w-full max-w-sm">
+                <Skeleton className="h-8 w-2/3 mb-6" />
+                <Skeleton className="h-12 w-full mb-4" />
+                <Skeleton className="h-12 w-full mb-6" />
+                <Skeleton className="h-12 w-full" />
+             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!auction) return <div className="text-white text-center mt-10">Auction not found.</div>;
-
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 flex justify-center">
       <div className="max-w-5xl w-full bg-gray-800 rounded-lg shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-2">
@@ -75,7 +70,7 @@ export default function AuctionDetails() {
           <div className="mb-6 p-4 bg-gray-900 rounded-lg border border-gray-700">
             <span className="text-sm text-gray-500 uppercase tracking-wider">Current price</span>
             <div className="text-5xl font-bold text-green-400 mt-2 transition-all duration-300">
-              {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(auction.currentPrice)}
+              {formatCurrency(auction.currentPrice)}
             </div>
           </div>
 
@@ -93,7 +88,6 @@ export default function AuctionDetails() {
             currentPrice={auction.currentPrice} 
           />
         </div>
-
       </div>
     </div>
   );
