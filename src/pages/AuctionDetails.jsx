@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import api from "../services/api";
 
 export default function AuctionDetails() {
   const { id } = useParams();
   const [auction, setAuction] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [connection, setConnection] = useState(null);
 
   useEffect(() => {
     async function fetchAuction() {
@@ -19,6 +21,43 @@ export default function AuctionDetails() {
       }
     }
     fetchAuction();
+  }, [id]);
+
+  useEffect(() => {
+    const newConnection = new HubConnectionBuilder()
+      .withUrl("http://localhost:5065/hubs/bidHub")
+      .withAutomaticReconnect()
+      .configureLogging(LogLevel.Information)
+      .build();
+
+      async function startConnection() {
+        try {
+          await newConnection.start();
+          console.log("SignalR Connected.");
+
+          await newConnection.invoke("JoinAuctionRoom", id);
+
+          newConnection.on("NewBidPlaced", (bid) => {
+            console.log("New bid received:", bid);
+            setAuction((prevAuction) => ({
+              ...prevAuction,
+              currentPrice: bid.amount,
+            }));
+          });
+
+          setConnection(newConnection);
+        } catch (error) {
+          console.error("Connection failed: ", error);
+        }
+      }
+      
+      startConnection();
+
+      return () => {
+        if (newConnection) {
+          newConnection.stop();
+        }
+      };
   }, [id]);
 
   if (loading)
