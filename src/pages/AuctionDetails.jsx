@@ -26,7 +26,7 @@ export default function AuctionDetails() {
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
-      .withUrl("http://localhost:5065/hubs/bidHub")
+      .withUrl(import.meta.env.VITE_SIGNALR_URL)
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
       .build();
