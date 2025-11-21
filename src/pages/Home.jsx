@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from '../services/api';
 
 export default function Home() {
     const [auctions, setAuctions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchAuctions() {
@@ -36,7 +38,10 @@ export default function Home() {
                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.currentPrice)}
                         </p>
 
-                        <button className="w-full bg-green-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <button
+                            onClick={() => navigate(`/auction/${item.id}`)}
+                            className="w-full bg-green-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        >
                             Place a bid
                         </button>
                     </div>
