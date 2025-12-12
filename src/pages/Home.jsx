@@ -9,6 +9,14 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    const userEmail = localStorage.getItem('gavel_user');
+
+    function handleLogout() {
+        localStorage.removeItem('gavel_token');
+        localStorage.removeItem('gavel_user');
+        window.location.reload();
+    }
+
     useEffect(() => {
         async function fetchAuctions() {
             try {
@@ -30,15 +38,30 @@ export default function Home() {
                 <div className="text-2xl font-bold flex items-center gap-2">
                     <span>🔨</span> Gavel
                 </div>
-                <div className="flex gap-4">
-                    <button className="text-gray-300 hover:text-white font-medium cursor-pointer">Login</button>
-                    
-                    <Link 
-                        to="/register" 
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold transition"
-                    >
-                        Create Account
-                    </Link>
+                <div className="flex gap-4 items-center">
+                    {userEmail ? (
+                        <>
+                        <span className="text-gray-300 text-sm hidden md:inline">Hello, {userEmail}</span>
+                            <button 
+                                onClick={handleLogout}
+                                className="text-red-400 hover:text-red-300 font-medium cursor-pointer border border-red-400/30 px-3 py-1 rounded"
+                            >
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link to = "/login" className="text-gray-300 hover:text-white font-medium cursor-pointer">
+                                Login
+                            </Link>
+                            <Link 
+                                to="/register" 
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold transition"
+                            >
+                                Create Account
+                            </Link>
+                        </>
+                    )}
                 </div>
             </header>
             
