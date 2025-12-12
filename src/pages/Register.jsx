@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
+import Navbar from "../components/Navbar";
 
 export default function Register() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -34,7 +35,7 @@ export default function Register() {
       await api.post('/Auth', formData);
       
       alert('Account created successfully!');
-      navigate('/'); 
+      navigate('/login'); 
     } catch (err) {
       console.error(err);
       const msg = err.response?.data?.detail || 
@@ -47,102 +48,109 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-gray-800 rounded-lg shadow-xl p-8 border border-gray-700">
-        <h2 className="text-3xl font-bold text-white text-center mb-6">Create your account</h2>
-        
-        {error && (
-          <div className="bg-red-900/50 border border-red-500 text-red-200 p-3 rounded mb-6 text-sm text-center">
-            {error}
-          </div>
-        )}
+    <div className="min-h-screen bg-[#0a0a0a] text-gray-100 font-sans selection:bg-gavel-green/30">
+      <Navbar />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+      <div className="pt-32 pb-20 px-6 flex items-center justify-center min-h-[80vh]">
+        <div className="max-w-md w-full bg-[#121212] rounded-2xl border border-gray-800 p-8 shadow-2xl">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
+            <p className="text-gray-400">Join Gavel to start bidding today.</p>
+          </div>
+          
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-4 rounded-xl mb-6 text-sm text-center">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-400 text-sm font-medium mb-2">First Name</label>
+                <input
+                  name="firstName"
+                  type="text"
+                  required
+                  maxLength={50}
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gavel-green focus:ring-1 focus:ring-gavel-green transition-all"
+                  placeholder="John"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-400 text-sm font-medium mb-2">Last Name</label>
+                <input
+                  name="lastName"
+                  type="text"
+                  required
+                  maxLength={50}
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gavel-green focus:ring-1 focus:ring-gavel-green transition-all"
+                  placeholder="Doe"
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-gray-400 text-sm mb-1">First Name</label>
+              <label className="block text-gray-400 text-sm font-medium mb-2">Email</label>
               <input
-                name="firstName"
-                type="text"
+                name="email"
+                type="email"
                 required
-                maxLength={50}
-                value={formData.firstName}
+                value={formData.email}
                 onChange={handleChange}
-                className="w-full p-3 bg-gray-900 text-white rounded border border-gray-600 focus:border-green-500 focus:outline-none"
-                placeholder="John"
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gavel-green focus:ring-1 focus:ring-gavel-green transition-all"
+                placeholder="john@example.com"
               />
             </div>
+
             <div>
-              <label className="block text-gray-400 text-sm mb-1">Last Name</label>
+              <label className="block text-gray-400 text-sm font-medium mb-2">Password</label>
               <input
-                name="lastName"
-                type="text"
+                name="password"
+                type="password"
                 required
-                maxLength={50}
-                value={formData.lastName}
+                minLength={6}
+                value={formData.password}
                 onChange={handleChange}
-                className="w-full p-3 bg-gray-900 text-white rounded border border-gray-600 focus:border-green-500 focus:outline-none"
-                placeholder="Smith"
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gavel-green focus:ring-1 focus:ring-gavel-green transition-all"
+                placeholder="Minimum 6 characters"
               />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-gray-400 text-sm mb-1">Email</label>
-            <input
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full p-3 bg-gray-900 text-white rounded border border-gray-600 focus:border-green-500 focus:outline-none"
-              placeholder="john@example.com"
-            />
-          </div>
+            <div>
+              <label className="block text-gray-400 text-sm font-medium mb-2">Confirm Password</label>
+              <input
+                name="confirmPassword"
+                type="password"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gavel-green focus:ring-1 focus:ring-gavel-green transition-all"
+                placeholder="Repeat password"
+              />
+            </div>
 
-          <div>
-            <label className="block text-gray-400 text-sm mb-1">Password</label>
-            <input
-              name="password"
-              type="password"
-              required
-              minLength={6}
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full p-3 bg-gray-900 text-white rounded border border-gray-600 focus:border-green-500 focus:outline-none"
-              placeholder="Minimum 6 characters"
-            />
-          </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3.5 px-4 rounded-xl font-bold text-black transition-all transform hover:scale-[1.02] active:scale-[0.98] mt-6
+                ${loading ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-white hover:bg-gavel-green hover:text-white shadow-lg shadow-white/5'}`}
+            >
+              {loading ? 'Creating...' : 'Sign Up'}
+            </button>
+          </form>
 
-          <div>
-            <label className="block text-gray-400 text-sm mb-1">Confirm Password</label>
-            <input
-              name="confirmPassword"
-              type="password"
-              required
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full p-3 bg-gray-900 text-white rounded border border-gray-600 focus:border-green-500 focus:outline-none"
-              placeholder="Repeat your password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full font-bold py-3 px-4 rounded text-white mt-6 transition duration-200
-              ${loading ? 'bg-gray-600 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 cursor-pointer'}`}
-          >
-            {loading ? 'Creating account...' : 'REGISTER'}
-          </button>
-        </form>
-
-        <p className="text-gray-400 text-center mt-6 text-sm">
-          Already have an account?{' '}
-          <Link to="/login" className="text-green-400 hover:underline">
-            Login
-          </Link>
-        </p>
+          <p className="text-gray-500 text-center mt-8 text-sm">
+            Already have an account?{' '}
+            <Link to="/login" className="text-gavel-green hover:text-emerald-400 font-medium hover:underline transition-colors">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
